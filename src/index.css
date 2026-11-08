@@ -1,0 +1,113 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    @apply bg-white text-curve-text font-sans antialiased;
+    word-break: keep-all;
+    overflow-wrap: break-word;
+  }
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply text-curve-ink;
+  }
+  :focus-visible {
+    outline: 2px solid #2f6bff;
+    outline-offset: 3px;
+    border-radius: 6px;
+  }
+  [id] {
+    scroll-margin-top: 88px;
+  }
+}
+
+@layer components {
+  .container-curve {
+    @apply mx-auto w-full max-w-content px-5 sm:px-8;
+  }
+  .eyebrow {
+    @apply inline-flex items-center gap-2 text-sm font-semibold tracking-wide text-curve-blue;
+  }
+  .section-title {
+    @apply text-[30px] font-bold leading-[1.25] tracking-tight sm:text-[38px];
+  }
+  .body-lg {
+    @apply text-[17px] leading-[1.7] sm:text-lg;
+  }
+  .input-curve {
+    @apply w-full rounded-xl border border-curve-line bg-white px-4 py-3 text-[16px] text-curve-ink placeholder:text-slate-400 transition focus:border-curve-blue focus:outline-none focus:ring-4 focus:ring-curve-blue/15;
+  }
+  .chip {
+    @apply inline-flex items-center gap-1.5 rounded-full border border-curve-line bg-white px-4 py-2 text-[15px] font-medium text-curve-text transition hover:border-curve-blue/50;
+  }
+  .chip[aria-pressed='true'],
+  .chip[aria-checked='true'] {
+    @apply border-curve-blue bg-curve-blue-soft text-curve-blue;
+  }
+}
+
+/* ---- 성장 곡선 그리기 ---- */
+.curve-draw {
+  stroke-dasharray: var(--len, 2000);
+  stroke-dashoffset: var(--len, 2000);
+  animation: curve-draw 1.2s cubic-bezier(0.65, 0, 0.35, 1) forwards;
+  animation-delay: var(--delay, 0s);
+}
+@keyframes curve-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+.curve-loop {
+  stroke-dasharray: 400;
+  stroke-dashoffset: 400;
+  animation: curve-loop 1.8s ease-in-out infinite;
+}
+@keyframes curve-loop {
+  0% { stroke-dashoffset: 400; }
+  60% { stroke-dashoffset: 0; }
+  100% { stroke-dashoffset: -400; }
+}
+
+/* ---- 스크롤 등장 ---- */
+.reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+  transition-delay: var(--delay, 0s);
+}
+.reveal.is-in {
+  opacity: 1;
+  transform: none;
+}
+
+.fade-up {
+  animation: fade-up 0.8s ease both;
+  animation-delay: var(--delay, 0s);
+}
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: none; }
+}
+
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { scrollbar-width: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+  .curve-draw { stroke-dashoffset: 0; }
+  .reveal { opacity: 1; transform: none; }
+}
