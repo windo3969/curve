@@ -141,14 +141,14 @@ export default function Try() {
       <Header />
       <main id="main" className="min-h-screen bg-curve-paper pt-[68px]">
         {phase === 'form' && (
-          <div className="container-curve py-10 sm:py-16">
+          <div className="container-curve pb-32 pt-6 sm:py-16">
             <div className="mx-auto max-w-[640px]">
               <CurveProgress value={(step + 1) / total} label={`${step + 1} / ${total}`} />
 
               <div
                 ref={panelRef}
                 onKeyDown={onKeyDown}
-                className="mt-8 rounded-[28px] border border-curve-line bg-white p-6 sm:p-10"
+                className="mt-5 rounded-[28px] border border-curve-line bg-white p-5 sm:mt-8 sm:p-10"
               >
                 <p className="text-sm font-semibold text-curve-blue">
                   질문 {step + 1}
@@ -168,11 +168,12 @@ export default function Try() {
                   </p>
                 )}
 
-                <div className="mt-10 flex items-center justify-between gap-3">
+                {/* 모바일에서는 화면 아래에 고정, 태블릿 이상에서는 카드 안에 */}
+                <div className="fixed inset-x-0 bottom-0 z-40 flex items-center justify-between gap-3 border-t border-curve-line bg-white/95 px-5 pt-3 pb-[max(12px,env(safe-area-inset-bottom))] backdrop-blur sm:static sm:z-auto sm:mt-10 sm:border-0 sm:bg-transparent sm:p-0 sm:backdrop-blur-none">
                   <Button variant="ghost" onClick={prev} disabled={step === 0} className="!px-2">
                     <ArrowLeft size={18} aria-hidden="true" /> {copy.prev}
                   </Button>
-                  <Button onClick={next}>
+                  <Button onClick={next} className="min-w-[140px] sm:min-w-0">
                     {step === total - 1 ? copy.submit : copy.next} <ArrowRight size={18} aria-hidden="true" />
                   </Button>
                 </div>

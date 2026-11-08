@@ -36,7 +36,7 @@ export default function Hero() {
           />
         </svg>
 
-        <div className="relative grid items-center gap-12 px-6 pb-14 pt-14 sm:px-12 sm:pt-20 lg:grid-cols-[1.1fr_0.9fr] lg:px-16 lg:pb-20">
+        <div className="relative grid items-center gap-8 px-6 pb-10 pt-10 sm:gap-12 sm:px-12 sm:pb-14 sm:pt-20 lg:grid-cols-[1.1fr_0.9fr] lg:px-16 lg:pb-20">
           <div>
             <p className="fade-up inline-flex items-center gap-2 rounded-full border border-curve-blue/20 bg-white px-3.5 py-1.5 text-[14px] font-semibold text-curve-blue">
               <span className="h-1.5 w-1.5 rounded-full bg-curve-blue" aria-hidden="true" />
@@ -60,7 +60,7 @@ export default function Hero() {
                 {hero.secondary}
               </ButtonLink>
             </div>
-            <p className="fade-up mt-8 text-[14px] font-medium text-curve-muted" style={{ ['--delay' as string]: '0.32s' }}>
+            <p className="fade-up mt-6 text-[14px] font-medium text-curve-muted sm:mt-8" style={{ ['--delay' as string]: '0.32s' }}>
               {hero.strip}
             </p>
           </div>
@@ -77,16 +77,16 @@ function CoverStack() {
   const { cover, chapters } = sampleReport;
   return (
     <div
-      className="fade-up relative mx-auto h-[360px] w-full max-w-[400px] sm:h-[420px]"
+      className="fade-up relative mx-auto h-[270px] w-full max-w-[340px] sm:h-[420px] sm:max-w-[400px]"
       style={{ ['--delay' as string]: '0.3s' }}
       role="img"
       aria-label="커브 로드맵 리포트 표지와 본문 페이지가 겹쳐 있는 미리보기"
     >
       {/* 뒤 장: 2장 표 */}
-      <div className="absolute left-[12%] top-6 h-[300px] w-[72%] rotate-[8deg] rounded-2xl border border-curve-line bg-white p-5 shadow-[0_10px_30px_-18px_rgba(17,24,39,0.25)] sm:h-[350px]">
-        <p className="text-[11px] font-semibold text-curve-blue">02장</p>
-        <p className="mt-1 text-[14px] font-bold text-curve-ink">{chapters[1].title}</p>
-        <div className="mt-4 overflow-hidden rounded-lg border border-curve-line text-[10px]">
+      <div className="absolute left-[12%] top-4 h-[230px] w-[72%] rotate-[8deg] sm:top-6 rounded-2xl border border-curve-line bg-white p-5 shadow-[0_10px_30px_-18px_rgba(17,24,39,0.25)] sm:h-[350px]">
+        <p className="hidden text-[11px] font-semibold text-curve-blue sm:block">02장</p>
+        <p className="mt-1 hidden text-[14px] font-bold text-curve-ink sm:block">{chapters[1].title}</p>
+        <div className="mt-4 hidden overflow-hidden sm:block rounded-lg border border-curve-line text-[10px]">
           <div className="grid grid-cols-3 bg-curve-blue-soft px-2 py-1.5 font-semibold text-curve-ink">
             {chapters[1].table!.headers.map((h) => (
               <span key={h} className="truncate">{h}</span>
@@ -103,7 +103,7 @@ function CoverStack() {
       </div>
 
       {/* 중간 장: 7장 체크리스트 */}
-      <div className="absolute left-[2%] top-10 h-[300px] w-[72%] -rotate-[6deg] rounded-2xl border border-curve-line bg-white p-5 shadow-[0_10px_30px_-18px_rgba(17,24,39,0.25)] sm:h-[350px]">
+      <div className="absolute left-[2%] top-10 hidden h-[300px] w-[72%] sm:block -rotate-[6deg] rounded-2xl border border-curve-line bg-white p-5 shadow-[0_10px_30px_-18px_rgba(17,24,39,0.25)] sm:h-[350px]">
         <p className="text-[11px] font-semibold text-curve-blue">07장</p>
         <p className="mt-1 text-[14px] font-bold text-curve-ink">이번 주 체크리스트</p>
         <ul className="mt-4 space-y-2">
@@ -117,7 +117,7 @@ function CoverStack() {
       </div>
 
       {/* 앞 장: 표지 */}
-      <div className="absolute right-0 top-0 h-[320px] w-[74%] rotate-[1.5deg] overflow-hidden rounded-2xl border border-curve-line bg-white p-6 shadow-[0_18px_40px_-20px_rgba(17,24,39,0.3)] sm:h-[370px]">
+      <div className="absolute right-0 top-0 h-[250px] w-[78%] rotate-[1.5deg] overflow-hidden rounded-2xl border border-curve-line bg-white p-5 sm:w-[74%] sm:p-6 shadow-[0_18px_40px_-20px_rgba(17,24,39,0.3)] sm:h-[370px]">
         <svg viewBox="0 0 300 200" className="absolute -right-4 bottom-0 w-[95%]" aria-hidden="true">
           <path d="M0 195 C 120 190, 160 70, 300 14" fill="none" stroke="#EAF0FF" strokeWidth="28" strokeLinecap="round" />
           <path d="M0 195 C 120 190, 160 70, 300 14" fill="none" stroke="#2F6BFF" strokeWidth="2" strokeLinecap="round" />
@@ -125,9 +125,9 @@ function CoverStack() {
         <p className="text-[10px] font-semibold tracking-wider text-curve-blue">CURVE ROADMAP</p>
         <p className="mt-4 text-[20px] font-bold leading-tight text-curve-ink">{cover.title}</p>
         <p className="mt-2 text-[11px] text-curve-muted">{cover.studentLine}</p>
-        <ol className="relative mt-6 space-y-1 text-[11px] text-curve-text">
+        <ol className="relative mt-4 space-y-1 text-[11px] text-curve-text sm:mt-6">
           {cover.toc.slice(0, 5).map((t) => (
-            <li key={t.number}>
+            <li key={t.number} className={t.number > 3 ? 'hidden sm:list-item' : ''}>
               <span className="mr-1.5 font-semibold text-curve-blue">{t.number}</span>
               {t.title}
             </li>

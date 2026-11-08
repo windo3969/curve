@@ -54,6 +54,8 @@ export const sample = {
   subtitle: '가상의 학생 한 명을 위해 만든 예시 리포트예요. 7개 장 전체를 그대로 읽어 보세요.',
   badge: '예시 리포트 · 등장 인물과 학교는 가상입니다',
   cta: '나도 이런 리포트 받아 보기',
+  skipToFeedback: '읽다가 바로 의견 남기기',
+  feedbackShort: '의견 남기기',
 };
 
 export const promise = {
