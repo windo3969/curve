@@ -8,7 +8,16 @@ import ReportChapter from './ReportChapter';
  * - 데스크톱: 왼쪽 sticky 목차 + 오른쪽 본문, 스크롤 위치에 따라 현재 장 강조
  * - 모바일: 위쪽 가로 스크롤 탭
  */
-export default function ReportViewer({ report, idPrefix = '' }: { report: Report; idPrefix?: string }) {
+export default function ReportViewer({
+  report,
+  idPrefix = '',
+  tailLink,
+}: {
+  report: Report;
+  idPrefix?: string;
+  /** 목차·탭 끝에 붙는 바로가기(예: 피드백 섹션) */
+  tailLink?: { href: string; label: string };
+}) {
   const items = [
     { id: `${idPrefix}cover`, short: '표지', label: '표지' },
     ...report.chapters.map((c) => ({ id: `${idPrefix}${c.id}`, short: `${c.number}장`, label: c.title })),
@@ -68,13 +77,21 @@ export default function ReportViewer({ report, idPrefix = '' }: { report: Report
               role="tab"
               aria-selected={active === it.id}
               onClick={go(it.id)}
-              className={`shrink-0 rounded-full px-4 py-2 text-[15px] font-medium transition ${
+              className={`inline-flex min-h-[44px] shrink-0 items-center rounded-full px-4 text-[15px] font-medium transition ${
                 active === it.id ? 'bg-curve-blue text-white' : 'text-curve-text hover:bg-curve-blue-soft'
               }`}
             >
               {it.short}
             </a>
           ))}
+          {tailLink && (
+            <a
+              href={tailLink.href}
+              className="ml-1 inline-flex min-h-[44px] shrink-0 items-center gap-1 rounded-full border border-curve-blue/30 bg-curve-blue-soft px-4 text-[15px] font-semibold text-curve-blue"
+            >
+              {tailLink.label} →
+            </a>
+          )}
         </div>
       </div>
 
@@ -104,6 +121,14 @@ export default function ReportViewer({ report, idPrefix = '' }: { report: Report
               );
             })}
           </ol>
+          {tailLink && (
+            <a
+              href={tailLink.href}
+              className="mt-6 inline-flex items-center gap-1 rounded-full border border-curve-blue/30 bg-curve-blue-soft px-4 py-2 text-[14px] font-semibold text-curve-blue transition hover:bg-curve-blue hover:text-white"
+            >
+              {tailLink.label} →
+            </a>
+          )}
         </div>
       </nav>
 
