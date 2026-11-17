@@ -1,6 +1,12 @@
-import type { Report } from '../../data/types';
+export type CoverData = {
+  title: string;
+  studentLine: string;
+  toc: { number?: number; title: string; depth?: number }[];
+  /** 표지에 보여 줄 입력 요약(관심 우선순위, 1년 계획 등) */
+  meta?: { label: string; value: string }[];
+};
 
-export default function ReportCover({ cover, id = 'cover' }: { cover: Report['cover']; id?: string }) {
+export default function ReportCover({ cover, id = 'cover' }: { cover: CoverData; id?: string }) {
   return (
     <article
       id={id}
@@ -22,13 +28,27 @@ export default function ReportCover({ cover, id = 'cover' }: { cover: Report['co
         <h3 className="mt-5 text-[28px] font-bold leading-tight tracking-tight sm:text-[36px]">{cover.title}</h3>
         <p className="mt-3 text-[16px] text-curve-muted sm:text-[17px]">{cover.studentLine}</p>
 
-        <div className="mt-10 max-w-[420px] rounded-xl border border-curve-line bg-white/90 p-5 backdrop-blur-sm">
+        {cover.meta && cover.meta.length > 0 && (
+          <dl className="mt-6 grid gap-x-6 gap-y-2 text-[15px] sm:grid-cols-[auto_1fr]">
+            {cover.meta.map((m) => (
+              <div key={m.label} className="contents">
+                <dt className="font-medium text-curve-muted">{m.label}</dt>
+                <dd className="text-curve-text">{m.value}</dd>
+              </div>
+            ))}
+          </dl>
+        )}
+
+        <div className="mt-10 max-w-[440px] rounded-xl border border-curve-line bg-white/90 p-5 backdrop-blur-sm">
           <p className="text-sm font-semibold text-curve-ink">목차</p>
           <ol className="mt-3 space-y-2 text-[15px] text-curve-text">
-            {cover.toc.map((t) => (
-              <li key={t.number} className="flex gap-3">
-                <span className="w-5 shrink-0 font-semibold tabular-nums text-curve-blue">{t.number}</span>
-                <span>{t.title}</span>
+            {cover.toc.map((t, i) => (
+              <li key={`${t.title}-${i}`} className="flex gap-3" style={t.depth ? { paddingLeft: `${t.depth * 16}px` } : undefined}>
+                <span className="w-5 shrink-0 font-semibold tabular-nums text-curve-blue">{t.number ?? i + 1}</span>
+                <span>
+                  {t.depth ? <span className="mr-1 text-curve-muted" aria-hidden="true">└</span> : null}
+                  {t.title}
+                </span>
               </li>
             ))}
           </ol>
