@@ -2,7 +2,7 @@
 
 같은 학과, 다른 커브. 대학생 맞춤 커리어 로드맵 서비스의 소개 페이지와 체험 화면이에요.
 
-- `/` 메인 랜딩 페이지(①~⑩ 섹션, 샘플 리포트 7개 장 전체 공개)
+- `/` 메인 랜딩 페이지(①~⑩ 섹션, 샘플 학생이 고른 7개 항목 리포트 전체 공개)
 - `/try` 체험 화면(스텝 폼 → 목차 고르기 → 생성 중 → 목업 결과). 체험판은 입력한 학과와 상관없이 기계공학과 트리로 시연해요.
 
 Vite + React + TypeScript + Tailwind CSS, 백엔드 없는 정적 사이트예요.
@@ -27,7 +27,7 @@ export const FEEDBACK_ENDPOINT = 'https://formspree.io/f/xxxxxxx';
 ```
 
 - 비어 있으면 전송하지 않고 브라우저 콘솔에 `[Curve feedback]`으로 출력한 뒤 완료 메시지를 보여 줘요.
-- 값이 있으면 JSON(`rating`, `usefulChapters`, `missing`, `school`, `grade`, `email`, `submittedAt`)을 POST로 보내요.
+- 값이 있으면 JSON(`rating`, `pickFeel`, `missing`, `school`, `grade`, `email`, `submittedAt`)을 POST로 보내요.
 - Google Apps Script를 쓸 때는 웹 앱을 "모든 사용자" 접근으로 배포하고 `doPost(e)`에서 `JSON.parse(e.postData.contents)`로 받으면 돼요.
 
 ## 문구 수정 위치
@@ -37,7 +37,7 @@ export const FEEDBACK_ENDPOINT = 'https://formspree.io/f/xxxxxxx';
 | 파일 | 내용 |
 |---|---|
 | `src/data/landing.ts` | 랜딩 페이지 섹션 문구(히어로, 공감, 작동 방식, 약속, 두 갈래, 피드백 폼, 마지막 CTA, 푸터 이메일) |
-| `src/data/sampleReport.ts` | 샘플 리포트 표지와 1~7장 |
+| `src/data/sampleRoadmap.ts` | 메인 페이지 샘플 학생(김하린)의 입력값과 고른 항목. 본문은 `src/data/trees/bizPages.ts` |
 | `src/data/faq.ts` | 자주 묻는 질문 |
 | `src/data/tryForm.ts` | 체험 화면 질문, 선택지, 로딩 메시지 |
 | `src/data/trees/` | 목차 고르기 추천 트리(학과별 진로 후보, 공통 가지)와 항목별 페이지 본문 |

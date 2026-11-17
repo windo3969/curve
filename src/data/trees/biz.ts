@@ -1,8 +1,9 @@
+import { contestPage, contestStoryPage, marketingPage, ncsPage, publicPage } from './bizPages';
 import type { DeptTree } from './types';
 
 /**
- * 경영학과 추천 트리(확정본). 지금은 제목과 요약만 있어요.
- * 메인 페이지 샘플 경로(마케팅·공기업 사무직·장학금)는 다음 단계에서 본문을 채워요.
+ * 경영학과 추천 트리(확정본).
+ * 메인 페이지 샘플 경로는 bizPages.ts에 한 페이지 분량 본문이 있고, 나머지 항목은 아직 제목과 요약만 있어요.
  */
 export const bizTree: DeptTree = {
   id: 'biz',
@@ -13,12 +14,14 @@ export const bizTree: DeptTree = {
       title: '마케팅',
       summary: '직무 종류(브랜드·퍼포먼스·콘텐츠), 필요한 역량',
       goalKeywords: ['마케팅', '마케터', '브랜드', '광고'],
+      page: marketingPage,
       children: [
         {
           id: 'biz-mkt-contest',
           title: '마케팅 공모전',
           summary: '공모전 종류, 기획서 구조, 팀 구성',
-          children: [{ id: 'biz-contest-story', title: '공모전 경험 정리하기', summary: '포트폴리오와 자소서에 쓰는 법' }],
+          page: contestPage,
+          children: [{ id: 'biz-contest-story', title: '공모전 경험 정리하기', summary: '포트폴리오와 자소서에 쓰는 법', page: contestStoryPage }],
         },
         { id: 'biz-data-mkt', title: '데이터 기반 마케팅 기초', summary: '필요한 도구, 배우는 순서' },
         { id: 'biz-mkt-club', title: '마케팅 학회', summary: '학회 활동 내용, 고르는 기준' },
@@ -55,8 +58,9 @@ export const bizTree: DeptTree = {
       title: '공기업 사무직',
       summary: '채용 구조, 기관 종류, 일반 기업과의 차이',
       goalKeywords: ['공기업', '공공기관', '공사', '공단'],
+      page: publicPage,
       children: [
-        { id: 'biz-ncs', title: 'NCS 필기', summary: '출제 영역, 준비 기간, 공부 방법' },
+        { id: 'biz-ncs', title: 'NCS 필기', summary: '출제 영역, 준비 기간, 공부 방법', page: ncsPage },
         { id: 'biz-major-exam', title: '전공 필기(경영·경제)', summary: '출제 범위, 학교 수업과 겹치는 부분' },
         { id: 'biz-public-intern', title: '공기업 체험형 인턴', summary: '지원 방법, 얻는 경험' },
       ],
