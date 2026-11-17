@@ -5,6 +5,9 @@ export type Category = (typeof categories)[number];
 /** 관심 카테고리는 우선순위 순서대로 최대 3개까지 골라요 */
 export const MAX_CATEGORIES = 3;
 
+/** 로드맵에 담을 수 있는 항목 수(표지 + 7페이지) */
+export const MAX_PICKS = 7;
+
 /** 앞으로 1년간 이미 세워 둔 계획(중복 선택) */
 export const plans = ['재학', '알바', '군대', '여행', '자격증/대외활동/공모전', '동아리', '기타'] as const;
 export type Plan = (typeof plans)[number];
@@ -27,6 +30,10 @@ export const tryCopy = {
     { title: '지금 목표가 있나요?', hint: '없어도 괜찮아요. 그럼 탐색형 커브로 그려 드려요.' },
     { title: '지금부터 1년 동안 이미 세워 둔 계획이 있나요?', hint: '해당하는 것을 모두 골라 주세요. 없으면 그냥 넘어가도 돼요.' },
     { title: '성향을 알려 주세요.', hint: 'MBTI는 참고용으로만 써요.' },
+    {
+      title: '로드맵에 담을 항목을 골라 주세요.',
+      hint: '최대 7개까지 골라요. 고른 항목 아래로 이어서 볼 주제가 열려요. 한 가지를 깊게 파도, 여러 가지를 넓게 봐도 좋아요.',
+    },
   ],
   labels: {
     name: '이름 또는 닉네임',
@@ -50,6 +57,8 @@ export const tryCopy = {
   required: {
     schoolDept: '학교, 학과, 학년을 모두 입력해 주세요.',
     category: '관심 카테고리를 하나 이상 골라 주세요.',
+    picks: '로드맵에 담을 항목을 하나 이상 골라 주세요.',
+    picksMax: '7칸이 다 찼어요. 바꾸려면 고른 항목을 한 번 더 눌러 빼 주세요.',
     categoryMax: '최대 3개까지 고를 수 있어요. 바꾸려면 고른 항목을 한 번 더 눌러 빼 주세요.',
   },
   prev: '이전',
@@ -58,8 +67,8 @@ export const tryCopy = {
   enterHint: 'Enter 키로 다음 단계로 넘어갈 수 있어요.',
   loading: (school: string, dept: string) => [
     `${school} ${dept} 정보를 찾고 있어요`,
-    '관심 분야에 맞는 이론을 고르고 있어요',
-    '이번 주 체크리스트를 정리하고 있어요',
+    '고른 항목을 목차 순서로 정리하고 있어요',
+    '페이지마다 필요한 내용을 채우고 있어요',
   ],
   resultNotice: '체험용 미리보기예요. 실제 서비스에서는 AI가 학교와 최신 정보를 조사해서 작성해요.',
   feedback: '피드백 남기기',

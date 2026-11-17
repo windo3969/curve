@@ -3,20 +3,24 @@ import { ArrowLeft, ArrowRight, Check, Info, RotateCcw, MessageSquareHeart } fro
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { Button, ButtonLink } from '../components/Button';
-import ReportViewer from '../components/report/ReportViewer';
+import { ReportShell, type ViewerPart } from '../components/report/ReportViewer';
+import ReportCover from '../components/report/ReportCover';
+import ReportPage from '../components/report/ReportPage';
+import TreePicker from '../components/picker/TreePicker';
 import {
   categories,
   grades,
   mbtiTypes,
   plans,
   MAX_CATEGORIES,
+  MAX_PICKS,
   tryCopy as copy,
   type Category,
   type Grade,
   type Plan,
 } from '../data/tryForm';
-import { generateReport, type TryInput } from '../lib/generateReport';
-import type { Report } from '../data/types';
+import { deptLabel, generateReport, rootsFor, type RoadmapReport, type TryInput } from '../lib/generateReport';
+import { indexTree, isDemoDept } from '../data/trees';
 
 const STORAGE_KEY = 'curve-try-input';
 const empty: TryInput = {
@@ -31,6 +35,7 @@ const empty: TryInput = {
   plans: [],
   planEtc: '',
   mbti: '',
+  picks: [],
 };
 
 function load(): TryInput {
@@ -41,6 +46,7 @@ function load(): TryInput {
     // 이전 버전에 저장된 값 중 지금 없는 선택지는 걸러 내요
     v.categories = (v.categories ?? []).filter((c) => categories.includes(c)).slice(0, MAX_CATEGORIES);
     v.plans = (v.plans ?? []).filter((p) => plans.includes(p));
+    v.picks = Array.isArray(v.picks) ? v.picks : [];
     return v;
   } catch {
     return empty;
@@ -61,12 +67,20 @@ export default function Try() {
   const [step, setStep] = useState(0);
   const [phase, setPhase] = useState<Phase>('form');
   const [error, setError] = useState('');
-  const [report, setReport] = useState<Report | null>(null);
+  const [report, setReport] = useState<RoadmapReport | null>(null);
   const [msgIndex, setMsgIndex] = useState(0);
   const panelRef = useRef<HTMLDivElement>(null);
   const total = copy.steps.length;
 
   useEffect(() => save(input), [input]);
+
+  // 관심 카테고리가 바뀌어 사라진 가지의 항목은 목차에서 빼요
+  useEffect(() => {
+    const valid = indexTree(rootsFor(input));
+    if (input.picks.some((id) => !valid.has(id))) {
+      setInput((cur) => ({ ...cur, picks: cur.picks.filter((id) => valid.has(id)) }));
+    }
+  }, [input.categories, input.picks]);
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [phase]);
@@ -84,6 +98,7 @@ export default function Try() {
   const validate = (s: number) => {
     if (s === 1 && (!input.school.trim() || !input.dept.trim() || !input.grade)) return copy.required.schoolDept;
     if (s === 2 && input.categories.length === 0) return copy.required.category;
+    if (s === PICK_STEP && input.picks.length === 0) return copy.required.picks;
     return '';
   };
 
@@ -103,7 +118,7 @@ export default function Try() {
 
   const submit = async () => {
     // 필수 항목 최종 확인
-    for (const s of [1, 2]) {
+    for (const s of [1, 2, PICK_STEP]) {
       const msg = validate(s);
       if (msg) {
         setStep(s);
@@ -142,7 +157,7 @@ export default function Try() {
       <main id="main" className="min-h-screen bg-curve-paper pt-[68px]">
         {phase === 'form' && (
           <div className="container-curve pb-32 pt-6 sm:py-16">
-            <div className="mx-auto max-w-[640px]">
+            <div className={`mx-auto ${step === PICK_STEP ? 'max-w-[760px]' : 'max-w-[640px]'}`}>
               <CurveProgress value={(step + 1) / total} label={`${step + 1} / ${total}`} />
 
               <div
@@ -174,7 +189,8 @@ export default function Try() {
                     <ArrowLeft size={18} aria-hidden="true" /> {copy.prev}
                   </Button>
                   <Button onClick={next} className="min-w-[140px] sm:min-w-0">
-                    {step === total - 1 ? copy.submit : copy.next} <ArrowRight size={18} aria-hidden="true" />
+                    {step === total - 1 ? `${copy.submit} (${input.picks.length}/${MAX_PICKS})` : copy.next}{' '}
+                    <ArrowRight size={18} aria-hidden="true" />
                   </Button>
                 </div>
               </div>
@@ -191,7 +207,7 @@ export default function Try() {
                 <path className="curve-loop" d="M10 110 C 80 106, 110 40, 190 12" fill="none" stroke="#2F6BFF" strokeWidth="4" strokeLinecap="round" />
               </svg>
               <ul className="mt-8 space-y-3">
-                {copy.loading(input.school.trim(), input.dept.trim()).map((m, i) => (
+                {copy.loading(input.school.trim(), deptLabel(input.dept)).map((m, i) => (
                   <li
                     key={m}
                     className={`text-[17px] transition-all duration-500 ${
@@ -211,10 +227,13 @@ export default function Try() {
           <div className="container-curve py-10 sm:py-14">
             <div className="mx-auto mb-10 flex max-w-[960px] items-start gap-3 rounded-2xl border border-curve-blue/20 bg-curve-blue-soft px-5 py-4 text-[15px] leading-relaxed text-curve-ink">
               <Info size={18} className="mt-[3px] shrink-0 text-curve-blue" aria-hidden="true" />
-              <p>{copy.resultNotice}</p>
+              <p>
+                {copy.resultNotice}
+                {report.demoNotice && <span className="mt-1 block font-semibold">{report.demoNotice}</span>}
+              </p>
             </div>
 
-            <ReportViewer report={report} idPrefix="r-" />
+            <ReportShell parts={toParts(report)} />
 
             <div className="mt-12 flex flex-wrap justify-center gap-3">
               <ButtonLink to="/#feedback" size="lg">
@@ -233,6 +252,22 @@ export default function Try() {
       </main>
     </>
   );
+}
+
+/** 목차 고르기 단계(0부터 센 순서) */
+const PICK_STEP = 6;
+
+function toParts(report: RoadmapReport): ViewerPart[] {
+  return [
+    { id: 'r-cover', short: '표지', label: '표지', content: <ReportCover cover={report.cover} id="r-cover" /> },
+    ...report.pages.map((p) => ({
+      id: p.id,
+      short: `${p.number} ${p.title.length > 7 ? `${p.title.slice(0, 7)}…` : p.title}`,
+      label: p.title,
+      depth: p.path.length,
+      content: <ReportPage data={p} />,
+    })),
+  ];
 }
 
 /** 곡선 모양 진행 바 */
@@ -436,6 +471,25 @@ function StepFields({
             </Field>
           </div>
         )}
+      </div>
+    );
+
+  if (step === PICK_STEP)
+    return (
+      <div>
+        {!isDemoDept(input.dept) && (
+          <p className="mb-4 rounded-xl bg-curve-blue-soft px-4 py-3 text-[14px] leading-relaxed text-curve-ink">
+            체험판에서는 입력하신 학과와 상관없이 <strong className="font-semibold">기계공학과</strong> 예시로 추천해 드려요.
+          </p>
+        )}
+        <TreePicker
+          roots={rootsFor(input)}
+          picked={input.picks}
+          onChange={(ids) => set('picks', ids)}
+          max={MAX_PICKS}
+          goal={input.noGoal ? '' : input.goal}
+          onFull={() => onError(copy.required.picksMax)}
+        />
       </div>
     );
 

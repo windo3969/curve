@@ -1,13 +1,21 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import type { Report } from '../../data/types';
 import ReportCover from './ReportCover';
 import ReportChapter from './ReportChapter';
 
-/**
- * 리포트 전체 보기
- * - 데스크톱: 왼쪽 sticky 목차 + 오른쪽 본문, 스크롤 위치에 따라 현재 장 강조
- * - 모바일: 위쪽 가로 스크롤 탭
- */
+/** 목차·탭에 들어갈 한 부분(표지 또는 한 페이지) */
+export type ViewerPart = {
+  id: string;
+  /** 모바일 탭 글자 */
+  short: string;
+  /** 데스크톱 목차 글자 */
+  label: string;
+  /** 데스크톱 목차 들여쓰기 깊이(0부터) */
+  depth?: number;
+  content: ReactNode;
+};
+
+/** 메인 페이지 샘플 리포트(고정 7개 장)용 */
 export default function ReportViewer({
   report,
   idPrefix = '',
@@ -18,10 +26,27 @@ export default function ReportViewer({
   /** 목차·탭 끝에 붙는 바로가기(예: 피드백 섹션) */
   tailLink?: { href: string; label: string };
 }) {
-  const items = [
-    { id: `${idPrefix}cover`, short: '표지', label: '표지' },
-    ...report.chapters.map((c) => ({ id: `${idPrefix}${c.id}`, short: `${c.number}장`, label: c.title })),
+  const parts: ViewerPart[] = [
+    { id: `${idPrefix}cover`, short: '표지', label: '표지', content: <ReportCover cover={report.cover} id={`${idPrefix}cover`} /> },
+    ...report.chapters.map((c) => ({
+      id: `${idPrefix}${c.id}`,
+      short: `${c.number}장`,
+      label: c.title,
+      content: <ReportChapter chapter={c} idPrefix={idPrefix} />,
+    })),
   ];
+  return <ReportShell parts={parts} tailLink={tailLink} />;
+}
+
+/**
+ * 리포트 전체 보기 틀
+ * - 데스크톱: 왼쪽 sticky 목차 + 오른쪽 본문, 스크롤 위치에 따라 현재 부분 강조
+ * - 모바일: 위쪽 가로 스크롤 탭
+ * 각 part.content는 id가 part.id이고 data-report-part 속성이 있는 요소여야 해요.
+ */
+export function ReportShell({ parts, tailLink }: { parts: ViewerPart[]; tailLink?: { href: string; label: string } }) {
+  const items = parts;
+  const partsKey = parts.map((p) => p.id).join('|');
   const [active, setActive] = useState(items[0].id);
   const rootRef = useRef<HTMLDivElement>(null);
   const tabsRef = useRef<HTMLDivElement>(null);
@@ -45,7 +70,7 @@ export default function ReportViewer({
     );
     parts.forEach((p) => io.observe(p));
     return () => io.disconnect();
-  }, [report]);
+  }, [partsKey]);
 
   // 모바일 탭: 현재 탭이 보이도록 가로 스크롤
   useEffect(() => {
@@ -108,6 +133,7 @@ export default function ReportViewer({
                     href={`#${it.id}`}
                     onClick={go(it.id)}
                     aria-current={on ? 'true' : undefined}
+                    style={it.depth ? { paddingLeft: `${16 + it.depth * 14}px` } : undefined}
                     className={`-ml-px flex gap-2 border-l-2 py-2 pl-4 pr-2 text-[15px] leading-snug transition ${
                       on
                         ? 'border-curve-blue font-semibold text-curve-blue'
@@ -134,9 +160,8 @@ export default function ReportViewer({
 
       {/* 본문 */}
       <div className="mx-auto w-full max-w-[720px] space-y-6 lg:mx-0">
-        <ReportCover cover={report.cover} id={`${idPrefix}cover`} />
-        {report.chapters.map((c) => (
-          <ReportChapter key={c.id} chapter={c} idPrefix={idPrefix} />
+        {parts.map((p) => (
+          <div key={p.id}>{p.content}</div>
         ))}
       </div>
     </div>
