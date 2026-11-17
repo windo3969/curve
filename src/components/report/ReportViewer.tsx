@@ -1,7 +1,4 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
-import type { Report } from '../../data/types';
-import ReportCover from './ReportCover';
-import ReportChapter from './ReportChapter';
 
 /** 목차·탭에 들어갈 한 부분(표지 또는 한 페이지) */
 export type ViewerPart = {
@@ -14,29 +11,6 @@ export type ViewerPart = {
   depth?: number;
   content: ReactNode;
 };
-
-/** 메인 페이지 샘플 리포트(고정 7개 장)용 */
-export default function ReportViewer({
-  report,
-  idPrefix = '',
-  tailLink,
-}: {
-  report: Report;
-  idPrefix?: string;
-  /** 목차·탭 끝에 붙는 바로가기(예: 피드백 섹션) */
-  tailLink?: { href: string; label: string };
-}) {
-  const parts: ViewerPart[] = [
-    { id: `${idPrefix}cover`, short: '표지', label: '표지', content: <ReportCover cover={report.cover} id={`${idPrefix}cover`} /> },
-    ...report.chapters.map((c) => ({
-      id: `${idPrefix}${c.id}`,
-      short: `${c.number}장`,
-      label: c.title,
-      content: <ReportChapter chapter={c} idPrefix={idPrefix} />,
-    })),
-  ];
-  return <ReportShell parts={parts} tailLink={tailLink} />;
-}
 
 /**
  * 리포트 전체 보기 틀

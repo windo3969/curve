@@ -1,6 +1,6 @@
 import type { CoverData } from '../components/report/ReportCover';
 import type { RoadmapPage } from '../components/report/ReportPage';
-import { DEMO_TREE, buildRoots, inTreeOrder, indexTree, isDemoDept, type Page, type TreeNode } from '../data/trees';
+import { DEMO_TREE, buildRoots, inTreeOrder, indexTree, isDemoDept, type DeptTree, type Page, type TreeNode } from '../data/trees';
 import type { Category, Grade, Plan } from '../data/tryForm';
 
 export type TryInput = {
@@ -37,22 +37,39 @@ export function deptLabel(dept: string): string {
 
 /**
  * 체험용 목업 리포트를 만들어요.
- * 고른 항목을 트리 순서로 정리해 한 항목 = 한 페이지로 구성합니다.
  * 나중에 실제 API 호출로 바꿀 수 있게 async 함수로 둬요.
  */
 export async function generateReport(input: TryInput): Promise<RoadmapReport> {
+  const report = buildRoadmap(DEMO_TREE, input, { deptName: deptLabel(input.dept), idPrefix: 'r-' });
+  return {
+    ...report,
+    demoNotice: isDemoDept(input.dept)
+      ? undefined
+      : `체험판에서는 입력하신 학과와 상관없이 ${DEMO_TREE.name} 예시로 보여 드려요.`,
+  };
+}
+
+/**
+ * 고른 항목을 트리 순서로 정리해 한 항목 = 한 페이지로 구성해요.
+ * 메인 페이지 샘플 리포트도 같은 함수로 만들어요.
+ */
+export function buildRoadmap(
+  tree: DeptTree,
+  input: TryInput,
+  opts: { deptName: string; idPrefix: string; term?: string },
+): RoadmapReport {
   const name = input.name.trim() || '학생';
   const school = input.school.trim();
   const grade = input.grade || '2학년';
-  const term = '2026년 2학기';
-  const roots = rootsFor(input);
+  const term = opts.term ?? '2026년 2학기';
+  const roots = buildRoots(tree, input.categories);
   const index = indexTree(roots);
   const ordered = inTreeOrder(roots, input.picks);
 
   const pages: RoadmapPage[] = ordered.map((node, i) => {
     const path = index.get(node.id)?.path ?? [];
     return {
-      id: `r-${node.id}`,
+      id: `${opts.idPrefix}${node.id}`,
       number: i + 1,
       title: node.title,
       path: path.map((p) => p.title),
@@ -73,14 +90,11 @@ export async function generateReport(input: TryInput): Promise<RoadmapReport> {
   return {
     cover: {
       title: `${name} 님의 커브 로드맵`,
-      studentLine: `${school} ${deptLabel(input.dept)} ${grade} · ${term}`,
+      studentLine: `${school} ${opts.deptName} ${grade} · ${term}`,
       meta,
       toc: pages.map((p) => ({ number: p.number, title: p.title, depth: p.path.length })),
     },
     pages,
-    demoNotice: isDemoDept(input.dept)
-      ? undefined
-      : `체험판에서는 입력하신 학과와 상관없이 ${DEMO_TREE.name} 예시로 보여 드려요.`,
   };
 }
 

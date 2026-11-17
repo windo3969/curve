@@ -1,9 +1,10 @@
 import { ArrowDown, ArrowRight, Info, MessageSquareHeart } from 'lucide-react';
 import { ButtonLink } from '../components/Button';
 import Reveal from '../components/Reveal';
-import ReportViewer from '../components/report/ReportViewer';
+import PickedPathCard from '../components/picker/PickedPathCard';
+import RoadmapViewer from '../components/report/RoadmapViewer';
 import { sample } from '../data/landing';
-import { sampleReport } from '../data/sampleReport';
+import { sampleInput, sampleRoadmap, sampleRoots } from '../data/sampleRoadmap';
 
 export default function SampleReport() {
   return (
@@ -31,8 +32,12 @@ export default function SampleReport() {
           </div>
         </Reveal>
 
+        <Reveal className="mx-auto mt-12 max-w-[960px]">
+          <PickedPathCard name={sampleInput.name.slice(1)} roots={sampleRoots} picked={sampleInput.picks} />
+        </Reveal>
+
         <div className="mt-12">
-          <ReportViewer report={sampleReport} tailLink={{ href: '#feedback', label: sample.feedbackShort }} />
+          <RoadmapViewer report={sampleRoadmap} coverId="s-cover" tailLink={{ href: '#feedback', label: sample.feedbackShort }} />
         </div>
 
         <div className="mt-12 flex flex-wrap justify-center gap-3">

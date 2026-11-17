@@ -4,14 +4,13 @@ import { Button } from '../components/Button';
 import Reveal from '../components/Reveal';
 import { FEEDBACK_ENDPOINT } from '../config';
 import { feedback as copy } from '../data/landing';
-import { sampleReport } from '../data/sampleReport';
 import { grades } from '../data/tryForm';
 
 type Status = 'idle' | 'sending' | 'done' | 'error';
 
 export default function Feedback() {
   const [rating, setRating] = useState(0);
-  const [chapters, setChapters] = useState<number[]>([]);
+  const [pickFeel, setPickFeel] = useState('');
   const [missing, setMissing] = useState('');
   const [school, setSchool] = useState('');
   const [grade, setGrade] = useState('');
@@ -19,12 +18,9 @@ export default function Feedback() {
   const [status, setStatus] = useState<Status>('idle');
   const [ratingError, setRatingError] = useState(false);
 
-  const toggleChapter = (n: number) =>
-    setChapters((cur) => (cur.includes(n) ? cur.filter((x) => x !== n) : [...cur, n].sort()));
-
   const reset = () => {
     setRating(0);
-    setChapters([]);
+    setPickFeel('');
     setMissing('');
     setSchool('');
     setGrade('');
@@ -40,7 +36,7 @@ export default function Feedback() {
     }
     const payload = {
       rating,
-      usefulChapters: chapters,
+      pickFeel,
       missing,
       school,
       grade,
@@ -125,19 +121,20 @@ export default function Feedback() {
                     )}
                   </fieldset>
 
-                  {/* 2. 유용한 장 */}
+                  {/* 2. 고르는 방식 */}
                   <fieldset>
                     <legend className="text-[17px] font-semibold text-curve-ink">2. {copy.q2}</legend>
-                    <div className="mt-3 flex flex-wrap gap-2">
-                      {sampleReport.chapters.map((c) => (
+                    <div className="mt-3 flex flex-wrap gap-2" role="radiogroup" aria-label={copy.q2}>
+                      {copy.q2Options.map((o) => (
                         <button
-                          key={c.number}
+                          key={o}
                           type="button"
+                          role="radio"
                           className="chip"
-                          aria-pressed={chapters.includes(c.number)}
-                          onClick={() => toggleChapter(c.number)}
+                          aria-checked={pickFeel === o}
+                          onClick={() => setPickFeel(pickFeel === o ? '' : o)}
                         >
-                          {c.number}장 {c.title.split(':')[0]}
+                          {o}
                         </button>
                       ))}
                     </div>

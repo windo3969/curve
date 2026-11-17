@@ -48,8 +48,8 @@ export default function Tracks() {
 function TrackArt({ kind }: { kind: 'explore' | 'prepare' }) {
   const label =
     kind === 'explore'
-      ? '여러 갈래의 작은 곡선이 퍼져 나가는 탐색형 커브 일러스트'
-      : '목표 지점까지 단계별로 오르는 준비형 커브 일러스트';
+      ? '한 지점에서 여러 갈래의 곡선이 퍼져 나가는 넓게 보기 일러스트'
+      : '한 길을 따라 단계별로 깊이 오르는 깊게 파기 일러스트';
   return (
     <div className="relative aspect-[4/3] overflow-hidden rounded-[28px] bg-curve-blue-soft" role="img" aria-label={label}>
       <svg viewBox="0 0 400 300" className="absolute inset-0 h-full w-full" aria-hidden="true">

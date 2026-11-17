@@ -1,7 +1,8 @@
 import { ArrowRight } from 'lucide-react';
 import { ButtonLink } from '../components/Button';
 import { hero } from '../data/landing';
-import { sampleReport } from '../data/sampleReport';
+import { sampleRoadmap } from '../data/sampleRoadmap';
+import type { Block } from '../data/trees';
 
 export default function Hero() {
   return (
@@ -74,7 +75,18 @@ export default function Hero() {
 
 /** 살짝 기울어 겹친 리포트 문서 카드 목업 */
 function CoverStack() {
-  const { cover, chapters } = sampleReport;
+  const { cover, pages } = sampleRoadmap;
+  // 뒤 장: 표가 있는 첫 페이지, 중간 장: 체크리스트가 있는 첫 페이지
+  const withBlock = <T extends Block['type']>(type: T) => {
+    for (const p of pages) {
+      const b = p.page.blocks.find((x): x is Extract<Block, { type: T }> => x.type === type);
+      if (b) return { page: p, block: b };
+    }
+    throw new Error(`샘플 리포트에 ${type} 블록이 없어요`);
+  };
+  const tablePart = withBlock('table');
+  const checkPart = withBlock('checklist');
+  const table = tablePart.block;
   return (
     <div
       className="fade-up relative mx-auto h-[270px] w-full max-w-[340px] sm:h-[420px] sm:max-w-[400px]"
@@ -82,17 +94,17 @@ function CoverStack() {
       role="img"
       aria-label="커브 로드맵 리포트 표지와 본문 페이지가 겹쳐 있는 미리보기"
     >
-      {/* 뒤 장: 2장 표 */}
+      {/* 뒤 장: 표가 있는 페이지 */}
       <div className="absolute left-[12%] top-4 h-[230px] w-[72%] rotate-[8deg] sm:top-6 rounded-2xl border border-curve-line bg-white p-5 shadow-[0_10px_30px_-18px_rgba(17,24,39,0.25)] sm:h-[350px]">
-        <p className="hidden text-[11px] font-semibold text-curve-blue sm:block">02장</p>
-        <p className="mt-1 hidden text-[14px] font-bold text-curve-ink sm:block">{chapters[1].title}</p>
+        <p className="hidden text-[11px] font-semibold text-curve-blue sm:block">{String(tablePart.page.number).padStart(2, '0')}</p>
+        <p className="mt-1 hidden text-[14px] font-bold text-curve-ink sm:block">{tablePart.page.title}</p>
         <div className="mt-4 hidden overflow-hidden sm:block rounded-lg border border-curve-line text-[10px]">
           <div className="grid grid-cols-3 bg-curve-blue-soft px-2 py-1.5 font-semibold text-curve-ink">
-            {chapters[1].table!.headers.map((h) => (
+            {table.headers.map((h) => (
               <span key={h} className="truncate">{h}</span>
             ))}
           </div>
-          {chapters[1].table!.rows.slice(0, 3).map((r, i) => (
+          {table.rows.slice(0, 3).map((r, i) => (
             <div key={i} className={`grid grid-cols-3 gap-1 px-2 py-1.5 ${i % 2 ? 'bg-slate-50' : ''}`}>
               {r.map((c, j) => (
                 <span key={j} className="truncate text-curve-text">{c}</span>
@@ -102,12 +114,12 @@ function CoverStack() {
         </div>
       </div>
 
-      {/* 중간 장: 7장 체크리스트 */}
+      {/* 중간 장: 체크리스트가 있는 페이지 */}
       <div className="absolute left-[2%] top-10 hidden h-[300px] w-[72%] sm:block -rotate-[6deg] rounded-2xl border border-curve-line bg-white p-5 shadow-[0_10px_30px_-18px_rgba(17,24,39,0.25)] sm:h-[350px]">
-        <p className="text-[11px] font-semibold text-curve-blue">07장</p>
-        <p className="mt-1 text-[14px] font-bold text-curve-ink">이번 주 체크리스트</p>
+        <p className="text-[11px] font-semibold text-curve-blue">{String(checkPart.page.number).padStart(2, '0')}</p>
+        <p className="mt-1 text-[14px] font-bold text-curve-ink">{checkPart.page.title}</p>
         <ul className="mt-4 space-y-2">
-          {chapters[6].checklist!.items.slice(0, 4).map((it) => (
+          {checkPart.block.items.slice(0, 4).map((it) => (
             <li key={it} className="flex items-start gap-2 text-[11px] leading-snug text-curve-text">
               <span className="mt-[2px] h-3 w-3 shrink-0 rounded-[3px] border border-curve-blue" />
               {it}
@@ -126,8 +138,8 @@ function CoverStack() {
         <p className="mt-4 text-[20px] font-bold leading-tight text-curve-ink">{cover.title}</p>
         <p className="mt-2 text-[11px] text-curve-muted">{cover.studentLine}</p>
         <ol className="relative mt-4 space-y-1 text-[11px] text-curve-text sm:mt-6">
-          {cover.toc.slice(0, 5).map((t) => (
-            <li key={t.number} className={t.number > 3 ? 'hidden sm:list-item' : ''}>
+          {cover.toc.slice(0, 5).map((t, i) => (
+            <li key={t.title} className={i >= 3 ? 'hidden sm:list-item' : ''} style={t.depth ? { paddingLeft: `${t.depth * 10}px` } : undefined}>
               <span className="mr-1.5 font-semibold text-curve-blue">{t.number}</span>
               {t.title}
             </li>

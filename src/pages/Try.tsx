@@ -3,9 +3,7 @@ import { ArrowLeft, ArrowRight, Check, Info, RotateCcw, MessageSquareHeart } fro
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { Button, ButtonLink } from '../components/Button';
-import { ReportShell, type ViewerPart } from '../components/report/ReportViewer';
-import ReportCover from '../components/report/ReportCover';
-import ReportPage from '../components/report/ReportPage';
+import RoadmapViewer from '../components/report/RoadmapViewer';
 import TreePicker from '../components/picker/TreePicker';
 import {
   categories,
@@ -233,7 +231,7 @@ export default function Try() {
               </p>
             </div>
 
-            <ReportShell parts={toParts(report)} />
+            <RoadmapViewer report={report} coverId="r-cover" />
 
             <div className="mt-12 flex flex-wrap justify-center gap-3">
               <ButtonLink to="/#feedback" size="lg">
@@ -256,19 +254,6 @@ export default function Try() {
 
 /** 목차 고르기 단계(0부터 센 순서) */
 const PICK_STEP = 6;
-
-function toParts(report: RoadmapReport): ViewerPart[] {
-  return [
-    { id: 'r-cover', short: '표지', label: '표지', content: <ReportCover cover={report.cover} id="r-cover" /> },
-    ...report.pages.map((p) => ({
-      id: p.id,
-      short: `${p.number} ${p.title.length > 7 ? `${p.title.slice(0, 7)}…` : p.title}`,
-      label: p.title,
-      depth: p.path.length,
-      content: <ReportPage data={p} />,
-    })),
-  ];
-}
 
 /** 곡선 모양 진행 바 */
 function CurveProgress({ value, label }: { value: number; label: string }) {
